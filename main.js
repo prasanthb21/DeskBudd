@@ -220,8 +220,9 @@ function createMainWindow() {
     transparent: true,
     alwaysOnTop: true,
     resizable: false,
-    skipTaskbar: true,
+    skipTaskbar: false,
     hasShadow: false,
+    icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -346,9 +347,9 @@ app.whenReady().then(() => {
   scheduleMoodAndIdleWatch();
 });
 
-app.on('window-all-closed', (e) => {
-  e.preventDefault();
-});
+// No window-all-closed override: closing the main window (e.g. via the
+// taskbar) should quit the app like any normal Windows program. The tray's
+// "Quit" item does the same thing via app.quit().
 
 ipcMain.handle('get-settings', () => store.store);
 

@@ -25,9 +25,14 @@
       "package.json"
     ],
     "win": {
-      "target": ["zip"],
+      "target": ["nsis", "zip"],
       "icon": "icon.png",
       "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
     }
   },
   "dependencies": {
