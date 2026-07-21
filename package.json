@@ -24,7 +24,10 @@
       "renderer/**/*",
       "icon.png",
       "icon-tray-mac.png",
-      "package.json"
+      "package.json",
+      "!node_modules/onnxruntime-node/**/*",
+      "!node_modules/sharp/**/*",
+      "!node_modules/@img/**/*"
     ],
     "win": {
       "target": [
@@ -41,8 +44,8 @@
     },
     "mac": {
       "target": [
-        "dmg",
-        "zip"
+        { "target": "dmg", "arch": ["universal"] },
+        { "target": "zip", "arch": ["universal"] }
       ],
       "icon": "icon.png",
       "category": "public.app-category.productivity",
