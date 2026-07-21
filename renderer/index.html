@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>DeskBudd</title>
+  <link rel="stylesheet" href="character.css" />
+</head>
+<body>
+  <div id="stage">
+    <div id="focus-badge" class="focus-badge hidden">
+      <span id="focus-time">25:00</span>
+      <button id="focus-cancel" title="Cancel focus session">✕</button>
+    </div>
+
+    <div id="bubble" class="bubble hidden">
+      <span id="bubble-text"></span>
+      <div class="bubble-actions">
+        <button id="bubble-ack" class="bubble-ack hidden">Got it 👍</button>
+        <button id="bubble-dismiss" title="Dismiss">✕</button>
+      </div>
+    </div>
+
+    <div id="character" class="character idle"></div>
+
+    <button id="treat-btn" class="treat-btn" title="Feed your buddy">🍪</button>
+
+    <div id="onboarding" class="onboarding hidden">
+      <div class="onboarding-card">
+        <h2>Meet your buddy</h2>
+        <div id="onboard-grid" class="char-grid"></div>
+        <input id="onboard-name" type="text" placeholder="Give them a name" maxlength="20" />
+        <button id="onboard-start">Let's go</button>
+      </div>
+    </div>
+
+    <div id="tray-hint" class="tray-hint">right-click for settings · 🍪 to feed</div>
+  </div>
+
+  <script src="characters.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>DeskBudd Settings</title>
+  <link rel="stylesheet" href="settings.css" />
+</head>
+<body>
+  <h1>DeskBudd Settings</h1>
+
+  <section>
+    <h2>Your Buddy</h2>
+    <label>Name <input type="text" id="buddyName" maxlength="20" /></label>
+    <div id="charGrid" class="char-grid"></div>
+    <div id="moodReadout" class="mood-readout"></div>
+  </section>
+
+  <section>
+    <h2>Timers</h2>
+    <label>
+      Water reminder every
+      <input type="number" id="waterInterval" min="5" max="240" /> minutes
+    </label>
+    <label>
+      Standup break every
+      <input type="number" id="standupInterval" min="10" max="240" /> minutes
+    </label>
+  </section>
+
+  <section>
+    <h2>Active Hours</h2>
+    <label>From <input type="time" id="activeStart" /></label>
+    <label>To <input type="time" id="activeEnd" /></label>
+    <label class="checkbox">
+      <input type="checkbox" id="activeDaysOnly" />
+      Weekdays only
+    </label>
+  </section>
+
+  <section>
+    <h2>Custom Reminders</h2>
+    <p class="hint">e.g. "Check important emails" at 09:30, or "Team calendar sync" at 14:00.</p>
+    <div id="reminderList"></div>
+    <div class="add-row">
+      <input type="text" id="newLabel" placeholder="Reminder text" />
+      <input type="time" id="newTime" />
+      <select id="newEmotion">
+        <option value="happy">Friendly</option>
+        <option value="excited">Excited</option>
+        <option value="urgent">Urgent</option>
+        <option value="calm">Calm</option>
+      </select>
+      <button id="addReminder">Add</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Focus Sessions</h2>
+    <p class="hint">Runs from the tray icon (right-click → Start Focus Session). While active, other reminders stay quiet.</p>
+  </section>
+
+  <section>
+    <h2>Daily Summary &amp; Idle Nudges</h2>
+    <label>Daily recap at <input type="time" id="dailySummaryTime" /></label>
+    <label>
+      Welcome me back after
+      <input type="number" id="idleWelcomeBackMin" min="5" max="120" /> min away
+    </label>
+  </section>
+
+  <section>
+    <h2>Appearance &amp; Behavior</h2>
+    <label>
+      Size
+      <select id="buddySize">
+        <option value="small">Small</option>
+        <option value="medium">Medium</option>
+        <option value="large">Large</option>
+      </select>
+    </label>
+    <label class="checkbox">
+      <input type="checkbox" id="alwaysOnTop" />
+      Always on top
+    </label>
+    <label class="checkbox">
+      <input type="checkbox" id="reduceMotion" />
+      Reduce motion
+    </label>
+  </section>
+
+  <div class="actions">
+    <button id="save">Save</button>
+    <span id="savedNote" class="saved-note hidden">Saved ✓</span>
+  </div>
+
+  <script src="characters.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{
+  "name": "deskbudd",
+  "version": "1.0.0",
+  "description": "An animated desktop character that walks over, reacts with real expressions, and reminds you to drink water, take standup breaks, run focus sessions, and catch reminders — on whichever monitor you're actually looking at.",
+  "main": "main.js",
+  "author": "Prasanth B",
+  "license": "MIT",
+  "homepage": "https://github.com/prasanthb21/DeskBudd",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/prasanthb21/DeskBudd.git"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.deskbudd.app",
+    "productName": "DeskBudd",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "icon.png",
+      "package.json"
+    ],
+    "win": {
+      "target": ["zip"],
+      "icon": "icon.png",
+      "signAndEditExecutable": false
+    }
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}
