@@ -11,10 +11,10 @@ expressions, and nudges you to drink water, take standup breaks, run focus
 sessions, and catch reminders — on whichever monitor you're actually looking at.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-5aa2ff.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows-5aa2ff.svg)](#download)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-5aa2ff.svg)](#download)
 [![Built with Electron](https://img.shields.io/badge/built%20with-Electron-5aa2ff.svg)](https://www.electronjs.org/)
 
-[**⬇ Download for Windows**](../../releases/latest) · [Features](#features) · [Run from source](#run-from-source)
+[**⬇ Download**](../../releases/latest) · [Features](#features) · [Run from source](#run-from-source)
 
 <img src="docs/screenshot-idle.png" width="240" alt="DeskBudd idling on the desktop" />
 
@@ -26,12 +26,26 @@ sessions, and catch reminders — on whichever monitor you're actually looking a
 
 **[Download the latest release →](../../releases/latest)**
 
+**Windows**
 - **`DeskBudd Setup <version>.exe`** — a real installer: Start Menu + Desktop
-  shortcuts, shows up in the taskbar with its own icon, and a normal entry in
-  Windows' "Add or remove programs." Closing it from the taskbar quits it,
-  same as any other app.
+  shortcuts, taskbar icon, normal entry in "Add or remove programs." Closing
+  it from the taskbar quits it, same as any other app.
 - **`DeskBudd-<version>-win.zip`** — portable alternative: unzip, run
   `DeskBudd.exe` directly, no install step.
+
+**macOS**
+- **`DeskBudd-<version>.dmg`** — drag DeskBudd into Applications like any
+  Mac app.
+- **`DeskBudd-<version>-mac.zip`** — portable alternative.
+- The app **isn't code-signed or notarized** (that needs a paid Apple
+  Developer account) — macOS's Gatekeeper will say it's "damaged" or from an
+  "unidentified developer" on first launch. Right-click the app → **Open** →
+  confirm in the dialog, and it'll launch normally from then on. Same reason
+  DeskBudd will ask for microphone access the first time you use hold-to-talk
+  — that's expected, not a bug.
+- Closing all windows on macOS follows the normal Mac convention: DeskBudd
+  stays running in the menu bar rather than quitting outright — use the menu
+  bar icon's "Quit" to fully exit, or Cmd+Q.
 
 Either way: no accounts, no sign-up, nothing phones home.
 
@@ -104,6 +118,10 @@ instead of locally — a clean `windows-latest` runner doesn't hit the Windows
 Defender block that a local build does (see the workflow file for why). Push
 a `v*` tag or trigger the workflow manually to build both.
 
+For macOS (`npm run dist:mac`), a Mac is required to build on — the CI
+workflow handles this on a `macos-latest` runner, same idea as the Windows
+installer above.
+
 ## Known limitations
 
 - Voice commands are a fixed vocabulary (see above), not open-ended
@@ -115,6 +133,13 @@ a `v*` tag or trigger the workflow manually to build both.
   with a live human voice in the environment this was built in (no physical
   mic available there). Worth a real test on your machine; open an issue if
   something doesn't sound right.
+- The macOS build was put together, verified to package correctly via CI
+  (`macos-latest`), and reasoned through for the real Windows/Mac behavior
+  differences (quit-on-close convention, menu bar icon sizing, microphone
+  permission entitlements) — but it was never run on actual Mac hardware,
+  since this project was built entirely on Windows. If something's off (a
+  permission dialog that doesn't appear, a sizing quirk in the menu bar),
+  please open an issue.
 
 ## Not built (by design)
 

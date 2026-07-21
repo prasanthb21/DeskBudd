@@ -297,7 +297,10 @@ function cancelFocusSession() {
 }
 
 function createTray() {
-  tray = new Tray(path.join(__dirname, 'icon.png'));
+  // macOS menu bar icons need to be small (the full 1024px app icon would be
+  // wildly oversized there); Windows' system tray handles the big one fine.
+  const trayIconFile = process.platform === 'darwin' ? 'icon-tray-mac.png' : 'icon.png';
+  tray = new Tray(path.join(__dirname, trayIconFile));
   tray.setToolTip('DeskBudd');
   rebuildTrayMenu();
 }
@@ -349,9 +352,16 @@ app.whenReady().then(() => {
   scheduleMoodAndIdleWatch();
 });
 
-// No window-all-closed override: closing the main window (e.g. via the
-// taskbar) should quit the app like any normal Windows program. The tray's
-// "Quit" item does the same thing via app.quit().
+// Electron does NOT quit automatically when all windows close — you have to
+// call app.quit() yourself, or the process keeps running invisibly with no
+// window and no way back short of a task manager. On Windows/Linux we want
+// closing the window (e.g. via the taskbar) to actually quit, matching normal
+// desktop-app behavior. On macOS the convention is the opposite: closing
+// windows leaves the app running in the menu bar/Dock until Cmd+Q or an
+// explicit Quit — so this only fires the auto-quit on non-mac platforms.
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
 
 ipcMain.handle('get-settings', () => store.store);
 

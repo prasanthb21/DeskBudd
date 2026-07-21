@@ -12,7 +12,8 @@
   },
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --win --publish never"
+    "dist": "electron-builder --win --publish never",
+    "dist:mac": "electron-builder --mac --publish never"
   },
   "build": {
     "appId": "com.deskbudd.app",
@@ -22,6 +23,7 @@
       "preload.js",
       "renderer/**/*",
       "icon.png",
+      "icon-tray-mac.png",
       "package.json"
     ],
     "win": {
@@ -36,6 +38,21 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "icon.png",
+      "category": "public.app-category.productivity",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "DeskBudd uses your microphone only when you hold-click the character to give it a voice command. Audio is processed entirely on your device and never sent anywhere."
+      },
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "identity": null
     }
   },
   "dependencies": {
