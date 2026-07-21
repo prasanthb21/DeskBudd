@@ -101,30 +101,32 @@ function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
+const DEFAULT_STATS = { water: 0, standup: 0, custom: 0, date: null };
+
 function resetStatsIfNewDay() {
-  const stats = store.get('stats');
+  const stats = store.get('stats', DEFAULT_STATS);
   if (stats.date !== todayKey()) {
     store.set('stats', { water: 0, standup: 0, custom: 0, date: todayKey() });
   }
 }
 
 function bumpMood(delta) {
-  const mood = store.get('mood');
+  const mood = store.get('mood', 70);
   store.set('mood', Math.max(0, Math.min(100, mood + delta)));
 }
 
 function recordAck(type) {
   resetStatsIfNewDay();
-  const stats = store.get('stats');
+  const stats = store.get('stats', DEFAULT_STATS);
   if (stats[type] !== undefined) stats[type] += 1;
   store.set('stats', stats);
   bumpMood(4);
 
-  const last = store.get('lastAckDate');
+  const last = store.get('lastAckDate', null);
   const today = todayKey();
   if (last !== today) {
     const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-    const streak = store.get('streakDays');
+    const streak = store.get('streakDays', 0);
     store.set('streakDays', last === yesterday ? streak + 1 : 1);
     store.set('lastAckDate', today);
   }
@@ -388,23 +390,23 @@ ipcMain.handle('drag-window', (event, { dx, dy }) => {
 ipcMain.handle('ack-reminder', (event, type) => {
   recordAck(type === 'water' || type === 'standup' ? type : 'custom');
   rebuildTrayMenu();
-  return { mood: store.get('mood'), streakDays: store.get('streakDays') };
+  return { mood: store.get('mood', 70), streakDays: store.get('streakDays', 0) };
 });
 
 ipcMain.handle('feed-buddy', () => {
   const today = todayKey();
-  const feedState = store.get('feedState') || { date: today, count: 0 };
+  const feedState = store.get('feedState', { date: today, count: 0 });
   if (feedState.date !== today) {
     feedState.date = today;
     feedState.count = 0;
   }
   if (feedState.count >= 6) {
-    return { fed: false, mood: store.get('mood'), reason: 'full' };
+    return { fed: false, mood: store.get('mood', 70), reason: 'full' };
   }
   feedState.count += 1;
   store.set('feedState', feedState);
   bumpMood(5);
-  return { fed: true, mood: store.get('mood') };
+  return { fed: true, mood: store.get('mood', 70) };
 });
 
 ipcMain.handle('start-focus', (event, minutes) => {
@@ -418,13 +420,13 @@ ipcMain.handle('cancel-focus', () => {
 });
 
 ipcMain.handle('get-mood', () => ({
-  mood: store.get('mood'),
-  streakDays: store.get('streakDays'),
-  stats: store.get('stats')
+  mood: store.get('mood', 70),
+  streakDays: store.get('streakDays', 0),
+  stats: store.get('stats', DEFAULT_STATS)
 }));
 
 ipcMain.handle('add-custom-reminder', (event, { label, time, emotion }) => {
-  const reminders = store.get('customReminders') || [];
+  const reminders = store.get('customReminders', []);
   reminders.push({
     id: `${Date.now()}`,
     label,
