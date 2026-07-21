@@ -422,3 +422,17 @@ ipcMain.handle('get-mood', () => ({
   streakDays: store.get('streakDays'),
   stats: store.get('stats')
 }));
+
+ipcMain.handle('add-custom-reminder', (event, { label, time, emotion }) => {
+  const reminders = store.get('customReminders') || [];
+  reminders.push({
+    id: `${Date.now()}`,
+    label,
+    time,
+    days: [],
+    emotion: emotion || 'happy'
+  });
+  store.set('customReminders', reminders);
+  rebuildTrayMenu();
+  return { ok: true, customReminders: reminders };
+});

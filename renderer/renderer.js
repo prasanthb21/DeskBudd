@@ -134,36 +134,145 @@ treatBtn.addEventListener('click', async () => {
 
 character.addEventListener('dblclick', hideBubble);
 
-// Distinguish click (quip) from drag (move window).
+// Distinguish click (quip) from drag (move window) from hold-and-speak.
 let dragging = false;
 let moved = false;
 let lastX = 0;
 let lastY = 0;
+let holdTimer = null;
+let isListening = false;
+const HOLD_TO_TALK_MS = 350;
 
 character.addEventListener('mousedown', (e) => {
   dragging = true;
   moved = false;
   lastX = e.screenX;
   lastY = e.screenY;
+
+  clearTimeout(holdTimer);
+  holdTimer = setTimeout(() => {
+    if (dragging && !moved) beginListening();
+  }, HOLD_TO_TALK_MS);
 });
 
 window.addEventListener('mousemove', (e) => {
   if (!dragging) return;
   const dx = e.screenX - lastX;
   const dy = e.screenY - lastY;
-  if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+  if ((Math.abs(dx) > 2 || Math.abs(dy) > 2) && !moved) {
+    moved = true;
+    clearTimeout(holdTimer);
+  }
+  if (isListening) return; // don't move the window mid-capture
   lastX = e.screenX;
   lastY = e.screenY;
   window.buddy.dragWindow(dx, dy);
 });
 
 window.addEventListener('mouseup', () => {
-  if (dragging && !moved) {
+  clearTimeout(holdTimer);
+  if (isListening) {
+    endListeningAndRespond();
+  } else if (dragging && !moved) {
     const quip = QUIPS[Math.floor(Math.random() * QUIPS.length)];
     deliverMessage(`${buddyName}: ${quip}`, 'happy', null);
   }
   dragging = false;
 });
+
+async function beginListening() {
+  isListening = true;
+  clearTimeout(hideTimer);
+  bubble.classList.add('hidden');
+  character.classList.remove('idle', 'talk', 'wave', 'attention', 'walking');
+  setFace(character, 'listening');
+  character.classList.add('listening');
+
+  try {
+    await window.buddyVoice.startListening();
+  } catch (err) {
+    isListening = false;
+    character.classList.remove('listening');
+    character.classList.add('idle');
+    deliverMessage(`${buddyName}: I couldn't reach the microphone — check permissions.`, 'calm', null);
+  }
+}
+
+async function endListeningAndRespond() {
+  if (!isListening) return;
+  isListening = false;
+  character.classList.remove('listening');
+
+  let audio;
+  try {
+    audio = await window.buddyVoice.stopListening();
+  } catch (err) {
+    character.classList.add('idle');
+    deliverMessage(`${buddyName}: Something went wrong while listening.`, 'calm', null);
+    return;
+  }
+
+  if (!audio || audio.length < 1600) {
+    character.classList.add('idle');
+    return;
+  }
+
+  character.classList.add('talk');
+  showBubble(`${buddyName} is thinking…`, null);
+
+  let text = '';
+  try {
+    text = await window.buddySTT.transcribe(audio);
+  } catch (err) {
+    hideBubble();
+    deliverMessage(`${buddyName}: I couldn't make that out.`, 'calm', null);
+    return;
+  }
+
+  if (!text) {
+    hideBubble();
+    deliverMessage(`${buddyName}: I didn't catch anything.`, 'calm', null);
+    return;
+  }
+
+  const parsed = window.buddyCommands.parseCommand(text);
+  const reply = await executeVoiceCommand(parsed);
+  hideBubble();
+  deliverMessage(`${buddyName}: ${reply}`, parsed.action === 'unknown' ? 'calm' : 'happy', null);
+  speak(reply);
+}
+
+async function executeVoiceCommand(parsed) {
+  switch (parsed.action) {
+    case 'startFocus':
+      await window.buddy.startFocus(parsed.minutes);
+      return `Starting a ${parsed.minutes} minute focus session.`;
+    case 'cancelFocus':
+      await window.buddy.cancelFocus();
+      return 'Focus session cancelled.';
+    case 'feed': {
+      const result = await window.buddy.feedBuddy();
+      return result && result.fed ? 'Yum, thanks for the treat!' : "I'm full for now, thank you though.";
+    }
+    case 'mood': {
+      const { mood, streakDays } = await window.buddy.getMood();
+      return `My mood is ${Math.round(mood)} out of 100, and we're on a ${streakDays} day streak.`;
+    }
+    case 'snooze':
+      await window.buddy.saveSettings({ snoozeUntil: Date.now() + 30 * 60 * 1000 });
+      return 'Snoozing reminders for 30 minutes.';
+    case 'addReminder':
+      await window.buddy.addCustomReminder({ label: parsed.label, time: parsed.time });
+      return `Got it — I'll remind you to ${parsed.label} at ${parsed.time}.`;
+    default:
+      return "Sorry, I didn't catch a command in that.";
+  }
+}
+
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+}
 
 character.addEventListener('contextmenu', () => {
   window.buddy.openSettings();
@@ -212,6 +321,20 @@ async function init() {
   if (!settings.onboarded) {
     renderOnboardGrid();
     onboarding.classList.remove('hidden');
+  }
+
+  // Warm up the speech model in the background so the first hold-to-talk
+  // isn't slowed by a cold model load. stt.js is an ES module (deferred),
+  // so it may not have attached window.buddySTT yet by the time this runs —
+  // fall back to its ready event in that case. Safe to fail quietly (e.g.
+  // no internet for the one-time model download) — it'll just retry on
+  // first real use.
+  if (window.buddySTT) {
+    window.buddySTT.preload().catch(() => {});
+  } else {
+    window.addEventListener('buddystt-ready', () => {
+      window.buddySTT.preload().catch(() => {});
+    }, { once: true });
   }
 }
 

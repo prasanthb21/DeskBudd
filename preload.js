@@ -14,5 +14,6 @@ contextBridge.exposeInMainWorld('buddy', {
   feedBuddy: () => ipcRenderer.invoke('feed-buddy'),
   startFocus: (minutes) => ipcRenderer.invoke('start-focus', minutes),
   cancelFocus: () => ipcRenderer.invoke('cancel-focus'),
-  getMood: () => ipcRenderer.invoke('get-mood')
+  getMood: () => ipcRenderer.invoke('get-mood'),
+  addCustomReminder: (reminder) => ipcRenderer.invoke('add-custom-reminder', reminder)
 });

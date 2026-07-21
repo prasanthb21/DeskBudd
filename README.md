@@ -26,12 +26,14 @@ sessions, and catch reminders — on whichever monitor you're actually looking a
 
 **[Download the latest release →](../../releases/latest)**
 
-1. Grab `DeskBudd-<version>-win.zip` from the link above
-2. Unzip it anywhere
-3. Run `DeskBudd.exe` — no installer, no admin rights, nothing to configure first
+- **`DeskBudd Setup <version>.exe`** — a real installer: Start Menu + Desktop
+  shortcuts, shows up in the taskbar with its own icon, and a normal entry in
+  Windows' "Add or remove programs." Closing it from the taskbar quits it,
+  same as any other app.
+- **`DeskBudd-<version>-win.zip`** — portable alternative: unzip, run
+  `DeskBudd.exe` directly, no install step.
 
-It's a portable app: no accounts, no sign-up, nothing phones home. Delete the
-folder to uninstall.
+Either way: no accounts, no sign-up, nothing phones home.
 
 ## Features
 
@@ -67,6 +69,18 @@ folder to uninstall.
 - Size (small/medium/large), always-on-top toggle, reduce-motion for anyone
   who'd rather it just snap into place
 
+**Voice ("hold and speak")**
+- Hold the character down (don't drag) for about a third of a second and it
+  starts listening — say something, let go, and it acts on it
+- Speech-to-text runs **entirely on-device** (Whisper-tiny via WASM) — no API
+  key, no account, no per-use network call; only a one-time model download
+  (~150MB) the first time you use it, cached afterward
+- Understands a fixed set of commands today (not open-ended chat): "start a
+  focus session", "cancel focus", "feed [the buddy]", "how's my mood",
+  "snooze", "remind me to _____ at _____"
+- Replies out loud via your system's text-to-speech voices, plus the usual
+  on-screen speech bubble
+
 <br clear="right"/>
 
 ## Run from source
@@ -84,8 +98,23 @@ npm start
 npm run dist
 ```
 
-Produces `dist/DeskBudd-<version>-win.zip` — the same portable build the
-releases on this repo ship.
+Produces the portable zip locally without issue. The NSIS installer
+(`.exe` Setup wizard) is built via [GitHub Actions](.github/workflows/release.yml)
+instead of locally — a clean `windows-latest` runner doesn't hit the Windows
+Defender block that a local build does (see the workflow file for why). Push
+a `v*` tag or trigger the workflow manually to build both.
+
+## Known limitations
+
+- Voice commands are a fixed vocabulary (see above), not open-ended
+  conversation — a natural next step would be routing the transcript through
+  an LLM (e.g. Claude) instead, using your own API key, for far more flexible
+  phrasing. Not done here to keep the base app free and dependency-light.
+- The hold-to-talk flow was verified end-to-end for model loading, command
+  parsing, and spoken replies — but actual microphone input wasn't tested
+  with a live human voice in the environment this was built in (no physical
+  mic available there). Worth a real test on your machine; open an issue if
+  something doesn't sound right.
 
 ## Not built (by design)
 
@@ -98,9 +127,10 @@ releases on this repo ship.
 
 ## Contributing
 
-Issues and PRs welcome. The whole app is ~10 small files — see
-[`renderer/characters.js`](renderer/characters.js) for the character system
-and [`main.js`](main.js) for the reminder/focus/mood logic.
+Issues and PRs welcome. See [`renderer/characters.js`](renderer/characters.js)
+for the character system, [`main.js`](main.js) for the reminder/focus/mood
+logic, and [`renderer/stt.js`](renderer/stt.js) / [`renderer/voice.js`](renderer/voice.js) /
+[`renderer/commands.js`](renderer/commands.js) for the voice pipeline.
 
 ## License
 

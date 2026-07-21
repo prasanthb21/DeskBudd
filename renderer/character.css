@@ -141,6 +141,31 @@ body.reduce-motion * {
 
 .mood-calm { filter: saturate(0.92); }
 
+/* Listening: held down, waiting for speech. Distinct from the message-delivery
+   states (walking/attention/talk) — this is buddy-initiated vs. user-initiated. */
+#character.listening #body-group {
+  animation: listening-sway 1.4s ease-in-out infinite;
+}
+
+@keyframes listening-sway {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50% { transform: translateY(-3px) scale(1.01, 0.99); }
+}
+
+#character.listening #ping {
+  stroke: #5aa2ff;
+  animation: listening-ring 1.6s ease-out infinite;
+}
+
+@keyframes listening-ring {
+  0% { opacity: 0.7; transform: scale(0.5); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+
+.mood-listening {
+  filter: drop-shadow(0 0 6px rgba(90, 162, 255, 0.6));
+}
+
 .bubble {
   position: absolute;
   top: 8px;

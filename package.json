@@ -25,7 +25,10 @@
       "package.json"
     ],
     "win": {
-      "target": ["nsis", "zip"],
+      "target": [
+        "nsis",
+        "zip"
+      ],
       "icon": "icon.png",
       "signAndEditExecutable": false
     },
@@ -36,6 +39,7 @@
     }
   },
   "dependencies": {
+    "@huggingface/transformers": "^4.2.0",
     "electron-store": "^8.2.0"
   },
   "devDependencies": {

@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <title>DeskBudd</title>
   <link rel="stylesheet" href="character.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "onnxruntime-common": "../node_modules/onnxruntime-common/dist/esm/index.js",
+        "onnxruntime-web/webgpu": "../node_modules/onnxruntime-web/dist/ort.webgpu.bundle.min.mjs",
+        "@huggingface/transformers": "../node_modules/@huggingface/transformers/dist/transformers.web.js"
+      }
+    }
+  </script>
 </head>
 <body>
   <div id="stage">
@@ -37,6 +46,9 @@
   </div>
 
   <script src="characters.js"></script>
+  <script src="commands.js"></script>
+  <script src="voice.js"></script>
+  <script type="module" src="stt.js"></script>
   <script src="renderer.js"></script>
 </body>
 </html>

@@ -110,6 +110,12 @@ const EMOTIONS = {
     browL: 'M-10,-31 L-3,-31',
     browR: 'M3,-31 L10,-31',
     bodyClass: 'mood-calm'
+  },
+  listening: {
+    mouth: 'M-3,-16 L3,-16',
+    browL: 'M-11,-35 L-3,-33',
+    browR: 'M3,-33 L11,-35',
+    bodyClass: 'mood-listening'
   }
 };
 
